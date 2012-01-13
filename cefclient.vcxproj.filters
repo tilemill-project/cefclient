@@ -85,12 +85,6 @@
     <ClInclude Include="include\internal\cef_string_wrappers.h">
       <Filter>include\internal</Filter>
     </ClInclude>
-    <ClInclude Include="cefclient\binding_test.h">
-      <Filter>cefclient</Filter>
-    </ClInclude>
-    <ClInclude Include="cefclient\uiplugin.h">
-      <Filter>cefclient</Filter>
-    </ClInclude>
     <ClInclude Include="cefclient\cefclient.h">
       <Filter>cefclient</Filter>
     </ClInclude>
@@ -100,22 +94,7 @@
     <ClInclude Include="cefclient\client_handler.h">
       <Filter>cefclient</Filter>
     </ClInclude>
-    <ClCompile Include="cefclient\uiplugin_test.cpp">
-      <Filter>cefclient</Filter>
-    </ClCompile>
-    <ClInclude Include="cefclient\extension_test.h">
-      <Filter>cefclient</Filter>
-    </ClInclude>
-    <ClCompile Include="cefclient\extension_test.cpp">
-      <Filter>cefclient</Filter>
-    </ClCompile>
     <ClInclude Include="cefclient\client_popup_handler.h">
-      <Filter>cefclient</Filter>
-    </ClInclude>
-    <ClInclude Include="cefclient\string_util.h">
-      <Filter>cefclient</Filter>
-    </ClInclude>
-    <ClInclude Include="cefclient\resource_util.h">
       <Filter>cefclient</Filter>
     </ClInclude>
     <ClInclude Include="cefclient\download_handler.h">
@@ -124,28 +103,13 @@
     <ClCompile Include="cefclient\cefclient.cpp">
       <Filter>cefclient</Filter>
     </ClCompile>
-    <ClInclude Include="cefclient\uiplugin_test.h">
-      <Filter>cefclient</Filter>
-    </ClInclude>
-    <ClCompile Include="cefclient\string_util.cpp">
-      <Filter>cefclient</Filter>
-    </ClCompile>
     <ClInclude Include="cefclient\cefclient_switches.h">
-      <Filter>cefclient</Filter>
-    </ClInclude>
-    <ClInclude Include="cefclient\scheme_test.h">
       <Filter>cefclient</Filter>
     </ClInclude>
     <ResourceCompile Include="cefclient\cefclient.rc">
       <Filter>cefclient</Filter>
     </ResourceCompile>
-    <ClCompile Include="cefclient\scheme_test.cpp">
-      <Filter>cefclient</Filter>
-    </ClCompile>
     <ClCompile Include="cefclient\cefclient_switches.cpp">
-      <Filter>cefclient</Filter>
-    </ClCompile>
-    <ClCompile Include="cefclient\uiplugin.cpp">
       <Filter>cefclient</Filter>
     </ClCompile>
     <ClCompile Include="cefclient\download_handler.cpp">
@@ -160,16 +124,10 @@
     <ClCompile Include="cefclient\client_popup_handler.cpp">
       <Filter>cefclient</Filter>
     </ClCompile>
-    <ClCompile Include="cefclient\resource_util_win.cpp">
-      <Filter>cefclient</Filter>
-    </ClCompile>
     <ClInclude Include="cefclient\util.h">
       <Filter>cefclient</Filter>
     </ClInclude>
     <ClCompile Include="cefclient\client_handler_win.cpp">
-      <Filter>cefclient</Filter>
-    </ClCompile>
-    <ClCompile Include="cefclient\binding_test.cpp">
       <Filter>cefclient</Filter>
     </ClCompile>
     <None Include="cefclient\res\extensionperf.html">

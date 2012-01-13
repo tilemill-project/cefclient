@@ -297,36 +297,22 @@
     <ClInclude Include="include\internal\cef_build.h" />
     <ClInclude Include="include\internal\cef_types_wrappers.h" />
     <ClInclude Include="include\internal\cef_string_wrappers.h" />
-    <ClInclude Include="cefclient\binding_test.h" />
-    <ClInclude Include="cefclient\uiplugin.h" />
     <ClInclude Include="cefclient\cefclient.h" />
     <ClInclude Include="cefclient\Resource.h" />
     <ClInclude Include="cefclient\client_handler.h" />
-    <ClInclude Include="cefclient\extension_test.h" />
     <ClInclude Include="cefclient\client_popup_handler.h" />
-    <ClInclude Include="cefclient\string_util.h" />
-    <ClInclude Include="cefclient\resource_util.h" />
     <ClInclude Include="cefclient\download_handler.h" />
-    <ClInclude Include="cefclient\uiplugin_test.h" />
     <ClInclude Include="cefclient\cefclient_switches.h" />
-    <ClInclude Include="cefclient\scheme_test.h" />
     <ClInclude Include="cefclient\util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cefclient\uiplugin_test.cpp" />
-    <ClCompile Include="cefclient\extension_test.cpp" />
     <ClCompile Include="cefclient\cefclient.cpp" />
-    <ClCompile Include="cefclient\string_util.cpp" />
-    <ClCompile Include="cefclient\scheme_test.cpp" />
     <ClCompile Include="cefclient\cefclient_switches.cpp" />
-    <ClCompile Include="cefclient\uiplugin.cpp" />
     <ClCompile Include="cefclient\download_handler.cpp" />
     <ClCompile Include="cefclient\cefclient_win.cpp" />
     <ClCompile Include="cefclient\client_handler.cpp" />
     <ClCompile Include="cefclient\client_popup_handler.cpp" />
-    <ClCompile Include="cefclient\resource_util_win.cpp" />
     <ClCompile Include="cefclient\client_handler_win.cpp" />
-    <ClCompile Include="cefclient\binding_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="cefclient\cefclient.rc" />

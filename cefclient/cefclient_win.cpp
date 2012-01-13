@@ -5,13 +5,8 @@
 #include "include/cef.h"
 #include "include/cef_runnable.h"
 #include "cefclient.h"
-#include "binding_test.h"
 #include "client_handler.h"
-#include "extension_test.h"
 #include "resource.h"
-#include "scheme_test.h"
-#include "string_util.h"
-#include "uiplugin_test.h"
 #include <commdlg.h>
 #include <direct.h>
 #include <sstream>
@@ -71,12 +66,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
   // Initialize CEF.
   CefInitialize(settings, app);
 
-  // Register the V8 extension handler.
-  InitExtensionTest();
-
-  // Register the scheme handler.
-  InitSchemeTest();
-  
   HACCEL hAccelTable;
 
   // Initialize global strings

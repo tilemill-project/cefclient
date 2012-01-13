@@ -8,8 +8,6 @@
 #include "cefclient.h"
 #include "cefclient_switches.h"
 #include "client_handler.h"
-#include "binding_test.h"
-#include "string_util.h"
 #include "util.h"
 #include <cstdlib>
 #include <sstream>
