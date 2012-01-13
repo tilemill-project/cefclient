@@ -8,8 +8,6 @@
 #include "binding_test.h"
 #include "client_handler.h"
 #include "extension_test.h"
-#include "osrplugin_test.h"
-#include "plugin_test.h"
 #include "resource.h"
 #include "scheme_test.h"
 #include "string_util.h"
@@ -72,15 +70,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
   // Initialize CEF.
   CefInitialize(settings, app);
-
-  // Register the internal client plugin.
-  InitPluginTest();
-
-  // Register the internal UI client plugin.
-  InitUIPluginTest();
-
-  // Register the internal OSR client plugin.
-  InitOSRPluginTest();
 
   // Register the V8 extension handler.
   InitExtensionTest();
@@ -452,102 +441,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           if(browser.get())
             browser->StopLoad();
           return 0;
-        case ID_TESTS_GETSOURCE: // Test the GetSource function
-          if(browser.get())
-            RunGetSourceTest(browser);
-          return 0;
-        case ID_TESTS_GETTEXT: // Test the GetText function
-          if(browser.get())
-            RunGetTextTest(browser);
-          return 0;
-        case ID_TESTS_JAVASCRIPT_BINDING: // Test the V8 binding handler
-          if(browser.get())
-            RunBindingTest(browser);
-          return 0;
-        case ID_TESTS_JAVASCRIPT_EXTENSION: // Test the V8 extension handler
-          if(browser.get())
-            RunExtensionTest(browser);
-          return 0;
-        case ID_TESTS_JAVASCRIPT_PERFORMANCE: // Test the V8 performance
-          if(browser.get())
-            RunExtensionPerfTest(browser);
-          return 0;
-        case ID_TESTS_JAVASCRIPT_EXECUTE: // Test execution of javascript
-          if(browser.get())
-            RunJavaScriptExecuteTest(browser);
-          return 0;
-        case ID_TESTS_JAVASCRIPT_INVOKE:
-          if(browser.get())
-            RunJavaScriptInvokeTest(browser);
-          return 0;
-        case ID_TESTS_PLUGIN: // Test the custom plugin
-          if(browser.get())
-            RunPluginTest(browser);
-          return 0;
-        case ID_TESTS_POPUP: // Test a popup window
-          if(browser.get())
-            RunPopupTest(browser);
-          return 0;
-        case ID_TESTS_TRANSPARENT_POPUP: // Test a transparent popup window
-          if(browser.get())
-            RunTransparentPopupTest(browser);
-          return 0;
-        case ID_TESTS_REQUEST: // Test a request
-          if(browser.get())
-            RunRequestTest(browser);
-          return 0;
-        case ID_TESTS_SCHEME_HANDLER: // Test the scheme handler
-          if(browser.get())
-            RunSchemeTest(browser);
-          return 0;
-        case ID_TESTS_UIAPP: // Test the UI app
-          if(browser.get())
-            RunUIPluginTest(browser);
-          return 0;
-        case ID_TESTS_OSRAPP: // Test the OSR app
-          if(browser.get())
-            RunOSRPluginTest(browser, false);
-          return 0;
-        case ID_TESTS_TRANSPARENT_OSRAPP: // Test the OSR app with transparency
-          if(browser.get())
-            RunOSRPluginTest(browser, true);
-          return 0;
-        case ID_TESTS_DOMACCESS: // Test DOM access
-          if(browser.get())
-            RunDOMAccessTest(browser);
-          return 0;
-        case ID_TESTS_LOCALSTORAGE: // Test localStorage
-          if(browser.get())
-            RunLocalStorageTest(browser);
-          return 0;
-        case ID_TESTS_ACCELERATED2DCANVAS: // Test accelerated 2d canvas
-          if(browser.get())
-            RunAccelerated2DCanvasTest(browser);
-          return 0;
-        case ID_TESTS_ACCELERATEDLAYERS: // Test accelerated layers
-          if(browser.get())
-            RunAcceleratedLayersTest(browser);
-          return 0;
-        case ID_TESTS_WEBGL: // Test WebGL
-          if(browser.get())
-            RunWebGLTest(browser);
-          return 0;
-        case ID_TESTS_HTML5VIDEO: // Test HTML5 video
-          if(browser.get())
-            RunHTML5VideoTest(browser);
-          return 0;
-        case ID_TESTS_DRAGDROP: // Test drag & drop
-          if(browser.get())
-            RunDragDropTest(browser);
-          return 0;
-        case ID_TESTS_XMLHTTPREQUEST: // Test XMLHttpRequest
-          if(browser.get())
-            RunXMLHTTPRequestTest(browser);
-          return 0;
-        case ID_TESTS_WEBURLREQUEST:
-          if (browser.get())
-            RunWebURLRequestTest(browser);
-          return 0;
         case ID_TESTS_ZOOM_IN:
           if(browser.get())
             browser->SetZoomLevel(browser->GetZoomLevel() + 0.5);
@@ -567,14 +460,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case ID_TESTS_DEVTOOLS_CLOSE:
           if (browser.get())
             browser->CloseDevTools();
-          return 0;
-        case ID_TESTS_MODALDIALOG:
-          if(browser.get())
-            RunModalDialogTest(browser);
-          return 0;
-        case ID_TESTS_GETIMAGE:
-          if(browser.get())
-            RunGetImageTest(browser);
           return 0;
         }
       }
