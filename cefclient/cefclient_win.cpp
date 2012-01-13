@@ -244,15 +244,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_EXIT:
           DestroyWindow(hWnd);
           return 0;
-        case ID_WARN_CONSOLEMESSAGE:
-          if(g_handler.get()) {
-            std::wstringstream ss;
-            ss << L"Console messages will be written to "
-                << std::wstring(CefString(g_handler->GetLogFile()));
-            MessageBox(hWnd, ss.str().c_str(), L"Console Messages",
-                MB_OK | MB_ICONINFORMATION);
-          }
-          return 0;
         case ID_WARN_DOWNLOADCOMPLETE:
         case ID_WARN_DOWNLOADERROR:
           if(g_handler.get()) {
@@ -269,65 +260,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             MessageBox(hWnd, ss.str().c_str(), L"File Download",
                 MB_OK | MB_ICONINFORMATION);
           }
-          return 0;
-        case ID_FIND:
-          if(!hFindDlg)
-          {
-            // Create the find dialog.
-            ZeroMemory(&fr, sizeof(fr));
-            fr.lStructSize = sizeof(fr);
-            fr.hwndOwner = hWnd;
-            fr.lpstrFindWhat = szFindWhat;
-            fr.wFindWhatLen = sizeof(szFindWhat);
-            fr.Flags = FR_HIDEWHOLEWORD | FR_DOWN;
-
-            hFindDlg = FindText(&fr);
-          }
-          else
-          {
-            // Give focus to the existing find dialog.
-            ::SetFocus(hFindDlg);
-          }
-          return 0;
-        case ID_PRINT:
-          if(browser.get())
-            browser->GetMainFrame()->Print();
-          return 0;
-        case IDC_NAV_BACK:  // Back button
-          if(browser.get())
-            browser->GoBack();
-          return 0;
-        case IDC_NAV_FORWARD: // Forward button
-          if(browser.get())
-            browser->GoForward();
-          return 0;
-        case IDC_NAV_RELOAD:  // Reload button
-          if(browser.get())
-            browser->Reload();
-          return 0;
-        case IDC_NAV_STOP:  // Stop button
-          if(browser.get())
-            browser->StopLoad();
-          return 0;
-        case ID_TESTS_ZOOM_IN:
-          if(browser.get())
-            browser->SetZoomLevel(browser->GetZoomLevel() + 0.5);
-          return 0;
-        case ID_TESTS_ZOOM_OUT:
-          if(browser.get())
-            browser->SetZoomLevel(browser->GetZoomLevel() - 0.5);
-          return 0;
-        case ID_TESTS_ZOOM_RESET:
-          if(browser.get())
-            browser->SetZoomLevel(0.0);
-          return 0;
-        case ID_TESTS_DEVTOOLS_SHOW:
-          if (browser.get())
-            browser->ShowDevTools();
-          return 0;
-        case ID_TESTS_DEVTOOLS_CLOSE:
-          if (browser.get())
-            browser->CloseDevTools();
           return 0;
         }
       }
