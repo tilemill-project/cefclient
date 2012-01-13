@@ -10,15 +10,9 @@
 #include <stdio.h>
 #include <string>
 
-
 ClientHandler::ClientHandler()
   : m_MainHwnd(NULL),
     m_BrowserHwnd(NULL),
-    m_EditHwnd(NULL),
-    m_BackHwnd(NULL),
-    m_ForwardHwnd(NULL),
-    m_StopHwnd(NULL),
-    m_ReloadHwnd(NULL),
     m_bFormElementHasFocus(false)
 {
 }
@@ -71,25 +65,6 @@ void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
   }
 }
 
-void ClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
-                                CefRefPtr<CefFrame> frame)
-{
-  REQUIRE_UI_THREAD();
-}
-
-void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
-                              CefRefPtr<CefFrame> frame,
-                              int httpStatusCode)
-{
-  REQUIRE_UI_THREAD();
-
-  if(m_BrowserHwnd == browser->GetWindowHandle() && frame->IsMain()) {
-    CefRefPtr<CefDOMVisitor> visitor = GetDOMVisitor(frame->GetURL());
-    if(visitor.get())
-      frame->VisitDOM(visitor);
-  }
-}
-
 bool ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame,
                                 ErrorCode errorCode,
@@ -139,57 +114,6 @@ bool ClientHandler::GetDownloadHandler(CefRefPtr<CefBrowser> browser,
   return true;
 }
 
-void ClientHandler::OnNavStateChange(CefRefPtr<CefBrowser> browser,
-                                     bool canGoBack,
-                                     bool canGoForward)
-{
-  REQUIRE_UI_THREAD();
-}
-
-bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
-                                     const CefString& message,
-                                     const CefString& source,
-                                     int line)
-{
-  REQUIRE_UI_THREAD();
-
-  bool first_message;
-  std::string logFile;
-
-  {
-    AutoLock lock_scope(this);
-    
-    first_message = m_LogFile.empty();
-    if(first_message) {
-      std::stringstream ss;
-      ss << AppGetWorkingDirectory();
-#if defined(OS_WIN)
-      ss << "\\";
-#else
-      ss << "/";
-#endif
-      ss << "console.log";
-      m_LogFile = ss.str();
-    }
-    logFile = m_LogFile;
-}
-  
-  FILE* file = fopen(logFile.c_str(), "a");
-  if(file) {
-    std::stringstream ss;
-    ss << "Message: " << std::string(message) << "\r\nSource: " <<
-        std::string(source) << "\r\nLine: " << line <<
-        "\r\n-----------------------\r\n";
-    fputs(ss.str().c_str(), file);
-    fclose(file);
-
-    if(first_message)
-      SendNotification(NOTIFY_CONSOLE_MESSAGE);
-  }
-
-  return false;
-}
-
 void ClientHandler::OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser,
                                          CefRefPtr<CefFrame> frame,
                                          CefRefPtr<CefDOMNode> node)
@@ -220,42 +144,6 @@ bool ClientHandler::OnKeyEvent(CefRefPtr<CefBrowser> browser,
   }
 
   return false;
-}
-
-bool ClientHandler::GetPrintHeaderFooter(CefRefPtr<CefBrowser> browser,
-                                         CefRefPtr<CefFrame> frame,
-                                         const CefPrintInfo& printInfo,
-                                         const CefString& url,
-                                         const CefString& title,
-                                         int currentPage,
-                                         int maxPages,
-                                         CefString& topLeft,
-                                         CefString& topCenter,
-                                         CefString& topRight,
-                                         CefString& bottomLeft,
-                                         CefString& bottomCenter,
-                                         CefString& bottomRight)
-{
-  REQUIRE_UI_THREAD();
-
-  // Place the page title at top left
-  topLeft = title;
-  // Place the page URL at top right
-  topRight = url;
-  
-  // Place "Page X of Y" at bottom center
-  std::stringstream strstream;
-  strstream << "Page " << currentPage << " of " << maxPages;
-  bottomCenter = strstream.str();
-
-  return false;
-}
-
-void ClientHandler::OnContextCreated(CefRefPtr<CefBrowser> browser,
-                                     CefRefPtr<CefFrame> frame,
-                                     CefRefPtr<CefV8Context> context)
-{
-  REQUIRE_UI_THREAD();
 }
 
 bool ClientHandler::OnDragStart(CefRefPtr<CefBrowser> browser,
@@ -305,30 +193,6 @@ void ClientHandler::SetMainHwnd(CefWindowHandle hwnd)
   m_MainHwnd = hwnd;
 }
 
-void ClientHandler::SetEditHwnd(CefWindowHandle hwnd)
-{
-  AutoLock lock_scope(this);
-  m_EditHwnd = hwnd;
-}
-
-void ClientHandler::SetButtonHwnds(CefWindowHandle backHwnd,
-                                   CefWindowHandle forwardHwnd,
-                                   CefWindowHandle reloadHwnd,
-                                   CefWindowHandle stopHwnd)
-{
-  AutoLock lock_scope(this);
-  m_BackHwnd = backHwnd;
-  m_ForwardHwnd = forwardHwnd;
-  m_ReloadHwnd = reloadHwnd;
-  m_StopHwnd = stopHwnd;
-}
-
-std::string ClientHandler::GetLogFile()
-{
-  AutoLock lock_scope(this);
-  return m_LogFile;
-}
-
 void ClientHandler::SetLastDownloadFile(const std::string& fileName)
 {
   AutoLock lock_scope(this);
@@ -339,24 +203,4 @@ std::string ClientHandler::GetLastDownloadFile()
 {
   AutoLock lock_scope(this);
   return m_LastDownloadFile;
-}
-
-void ClientHandler::AddDOMVisitor(const std::string& path,
-                                  CefRefPtr<CefDOMVisitor> visitor)
-{
-  AutoLock lock_scope(this);
-  DOMVisitorMap::iterator it = m_DOMVisitors.find(path);
-  if (it == m_DOMVisitors.end())
-    m_DOMVisitors.insert(std::make_pair(path, visitor));
-  else
-    it->second = visitor;
-}
-
-CefRefPtr<CefDOMVisitor> ClientHandler::GetDOMVisitor(const std::string& path)
-{
-  AutoLock lock_scope(this);
-  DOMVisitorMap::iterator it = m_DOMVisitors.find(path);
-  if (it != m_DOMVisitors.end())
-    return it->second;
-  return NULL;
 }

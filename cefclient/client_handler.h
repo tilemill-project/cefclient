@@ -58,11 +58,6 @@ public:
   virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
 
   // CefLoadHandler methods
-  virtual void OnLoadStart(CefRefPtr<CefBrowser> browser,
-                           CefRefPtr<CefFrame> frame) OVERRIDE;
-  virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser,
-                         CefRefPtr<CefFrame> frame,
-                         int httpStatusCode) OVERRIDE;
   virtual bool OnLoadError(CefRefPtr<CefBrowser> browser,
                            CefRefPtr<CefFrame> frame,
                            ErrorCode errorCode,
@@ -76,15 +71,6 @@ public:
                                   int64 contentLength,
                                   CefRefPtr<CefDownloadHandler>& handler)
                                   OVERRIDE;
-
-  // CefDisplayHandler methods
-  virtual void OnNavStateChange(CefRefPtr<CefBrowser> browser,
-                                bool canGoBack,
-                                bool canGoForward) OVERRIDE;
-  virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
-                                const CefString& message,
-                                const CefString& source,
-                                int line) OVERRIDE;
   
   // CefFocusHandler methods.
   virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser,
@@ -98,26 +84,6 @@ public:
                           int modifiers,
                           bool isSystemKey,
                           bool isAfterJavaScript) OVERRIDE;
-
-  // CefPrintHandler methods.
-  virtual bool GetPrintHeaderFooter(CefRefPtr<CefBrowser> browser,
-                                    CefRefPtr<CefFrame> frame,
-                                    const CefPrintInfo& printInfo,
-                                    const CefString& url,
-                                    const CefString& title,
-                                    int currentPage,
-                                    int maxPages,
-                                    CefString& topLeft,
-                                    CefString& topCenter,
-                                    CefString& topRight,
-                                    CefString& bottomLeft,
-                                    CefString& bottomCenter,
-                                    CefString& bottomRight) OVERRIDE;
-  
-  // CefV8ContextHandler methods
-  virtual void OnContextCreated(CefRefPtr<CefBrowser> browser,
-                                CefRefPtr<CefFrame> frame,
-                                CefRefPtr<CefV8Context> context) OVERRIDE;
 
   // CefDragHandler methods.
   virtual bool OnDragStart(CefRefPtr<CefBrowser> browser,
@@ -171,18 +137,6 @@ protected:
 
   // The child browser window handle
   CefWindowHandle m_BrowserHwnd;
-
-  // The edit window handle
-  CefWindowHandle m_EditHwnd;
-
-  // The button window handles
-  CefWindowHandle m_BackHwnd;
-  CefWindowHandle m_ForwardHwnd;
-  CefWindowHandle m_StopHwnd;
-  CefWindowHandle m_ReloadHwnd;
-
-  // Support for logging.
-  std::string m_LogFile;
 
   // Support for downloading files.
   std::string m_LastDownloadFile;

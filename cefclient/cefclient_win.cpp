@@ -226,7 +226,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // Creat the new child browser window
         CefBrowser::CreateBrowser(info,
             static_cast<CefRefPtr<CefClient> >(g_handler),
-            "http://www.google.com", settings);
+			"http://localhost:20009", settings);
+            // "http://www.google.com", settings);
       }
       return 0;
 
