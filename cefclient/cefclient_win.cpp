@@ -203,74 +203,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
   if(hWnd == editWnd)
   {
-    // Callback for the edit window
-    switch (message)
-    {
-    case WM_CHAR:
-      if (wParam == VK_RETURN && g_handler.get())
-      {
-        // When the user hits the enter key load the URL
-        CefRefPtr<CefBrowser> browser = g_handler->GetBrowser();
-        wchar_t strPtr[MAX_URL_LENGTH] = {0};
-        *((LPWORD)strPtr) = MAX_URL_LENGTH; 
-        LRESULT strLen = SendMessage(hWnd, EM_GETLINE, 0, (LPARAM)strPtr);
-        if (strLen > 0) {
-          strPtr[strLen] = 0;
-          browser->GetMainFrame()->LoadURL(strPtr);
-        }
-
-        return 0;
-      }
-    }
-
     return (LRESULT)CallWindowProc(editWndOldProc, hWnd, message, wParam, lParam);
-  }
-  else if (message == uFindMsg)
-  { 
-    // Find event.
-    LPFINDREPLACE lpfr = (LPFINDREPLACE)lParam;
-
-    if (lpfr->Flags & FR_DIALOGTERM)
-    { 
-      // The find dialog box has been dismissed so invalidate the handle and
-      // reset the search results.
-      hFindDlg = NULL; 
-      if(g_handler.get())
-      {
-        g_handler->GetBrowser()->StopFinding(true);
-        szLastFindWhat[0] = 0;
-        findNext = false;
-      }
-      return 0; 
-    } 
-
-    if ((lpfr->Flags & FR_FINDNEXT) && g_handler.get()) 
-    {
-      // Search for the requested string.
-      bool matchCase = (lpfr->Flags & FR_MATCHCASE?true:false);
-      if(matchCase != lastMatchCase ||
-        (matchCase && wcsncmp(szFindWhat, szLastFindWhat,
-          sizeof(szLastFindWhat)/sizeof(WCHAR)) != 0) ||
-        (!matchCase && _wcsnicmp(szFindWhat, szLastFindWhat,
-          sizeof(szLastFindWhat)/sizeof(WCHAR)) != 0))
-      {
-        // The search string has changed, so reset the search results.
-        if(szLastFindWhat[0] != 0) {
-          g_handler->GetBrowser()->StopFinding(true);
-          findNext = false;
-        }
-        lastMatchCase = matchCase;
-        wcscpy_s(szLastFindWhat, sizeof(szLastFindWhat)/sizeof(WCHAR),
-            szFindWhat);
-      }
-
-      g_handler->GetBrowser()->Find(0, lpfr->lpstrFindWhat,
-          (lpfr->Flags & FR_DOWN)?true:false, matchCase, findNext);
-      if(!findNext)
-        findNext = true;
-    }
-
-    return 0; 
   }
   else
   {
