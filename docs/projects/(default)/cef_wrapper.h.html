@@ -1,0 +1,334 @@
+<HTML>
+<HEAD>
+<TITLE>
+cef_wrapper.h
+</TITLE>
+</HEAD>
+<BODY>
+<PRE>
+<font color="green">// Copyright (c) 2010 Marshall A. Greenblatt. All rights reserved.</font>
+<font color="green">//</font>
+<font color="green">// Redistribution and use in source and binary forms, with or without</font>
+<font color="green">// modification, are permitted provided that the following conditions are</font>
+<font color="green">// met:</font>
+<font color="green">//</font>
+<font color="green">//    * Redistributions of source code must retain the above copyright</font>
+<font color="green">// notice, this list of conditions and the following disclaimer.</font>
+<font color="green">//    * Redistributions in binary form must reproduce the above</font>
+<font color="green">// copyright notice, this list of conditions and the following disclaimer</font>
+<font color="green">// in the documentation and/or other materials provided with the</font>
+<font color="green">// distribution.</font>
+<font color="green">//    * Neither the name of Google Inc. nor the name Chromium Embedded</font>
+<font color="green">// Framework nor the names of its contributors may be used to endorse</font>
+<font color="green">// or promote products derived from this software without specific prior</font>
+<font color="green">// written permission.</font>
+<font color="green">//</font>
+<font color="green">// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</font>
+<font color="green">// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</font>
+<font color="green">// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</font>
+<font color="green">// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</font>
+<font color="green">// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</font>
+<font color="green">// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</font>
+<font color="green">// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</font>
+<font color="green">// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</font>
+<font color="green">// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</font>
+<font color="green">// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</font>
+<font color="green">// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</font>
+<font color="green">//</font>
+<font color="green">// ---------------------------------------------------------------------------</font>
+<font color="green">//</font>
+<font color="green">// The contents of this file are only available to applications that link</font>
+<font color="green">// against the libcef_dll_wrapper target.</font>
+<font color="green">//</font>
+
+<font color="blue">#ifndef</font> _CEF_WRAPPER_H
+<font color="blue">#define</font> _CEF_WRAPPER_H
+
+<font color="blue">#include</font> <font color="maroon">"cef.h"</font>
+<font color="blue">#include</font> <font color="maroon">&#60;map&#62;</font>
+<font color="blue">#include</font> <font color="maroon">&#60;vector&#62;</font>
+
+<font color="green">///</font>
+<font color="green">// Thread safe class for representing XML data as a structured object. This</font>
+<font color="green">// class should not be used with large XML documents because all data will be</font>
+<font color="green">// resident in memory at the same time. This implementation supports a</font>
+<font color="green">// restricted set of XML features:</font>
+<font color="green">// &#60;pre&#62;</font>
+<font color="green">// (1) Processing instructions, whitespace and comments are ignored.</font>
+<font color="green">// (2) Elements and attributes must always be referenced using the fully</font>
+<font color="green">//     qualified name (ie, namespace:localname).</font>
+<font color="green">// (3) Empty elements (&#60;a/&#62;) and elements with zero-length values (&#60;a&#62;&#60;/a&#62;)</font>
+<font color="green">//     are considered the same.</font>
+<font color="green">// (4) Element nodes are considered part of a value if:</font>
+<font color="green">//     (a) The element node follows a non-element node at the same depth</font>
+<font color="green">//         (see 5), or</font>
+<font color="green">//     (b) The element node does not have a namespace and the parent node does.</font>
+<font color="green">// (5) Mixed node types at the same depth are combined into a single element</font>
+<font color="green">//     value as follows:</font>
+<font color="green">//     (a) All node values are concatenated to form a single string value.</font>
+<font color="green">//     (b) Entity reference nodes are resolved to the corresponding entity</font>
+<font color="green">//         value.</font>
+<font color="green">//     (c) Element nodes are represented by their outer XML string.</font>
+<font color="green">// &#60;/pre&#62;</font>
+<font color="green">///</font>
+<font color="blue">class</font> CefXmlObject <font color="black">:</font> <font color="blue">public</font> CefBase
+<font color="black">{</font>
+<font color="blue">public</font><font color="black">:</font>
+  <font color="blue">typedef</font> std<font color="black">:</font><font color="black">:</font>vector<font color="black">&#60;</font>CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> <font color="black">&#62;</font> ObjectVector;
+  <font color="blue">typedef</font> std<font color="black">:</font><font color="black">:</font>map<font color="black">&#60;</font>CefString, CefString <font color="black">&#62;</font> AttributeMap;
+
+  <font color="green">///</font>
+  <font color="green">// Create a new object with the specified name. An object name must always be</font>
+  <font color="green">// at least one character long.</font>
+  <font color="green">///</font>
+  CefXmlObject<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> <font color="blue">name</font><font color="black">)</font>;
+  virtual ~CefXmlObject<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Load the contents of the specified XML stream into this object.  The</font>
+  <font color="green">// existing children and attributes, if any, will first be cleared.</font>
+  <font color="green">///</font>
+  <font color="blue">bool</font> Load<font color="black">(</font>CefRefPtr<font color="black">&#60;</font>CefStreamReader<font color="black">&#62;</font> stream,
+            CefXmlReader<font color="black">:</font><font color="black">:</font>EncodingType encodingType,
+            <font color="blue">const</font> CefString<font color="black">&</font> URI, CefString<font color="black">*</font> loadError<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Set the name, children and attributes of this object to a duplicate of the</font>
+  <font color="green">// specified object's contents. The existing children and attributes, if any,</font>
+  <font color="green">// will first be cleared.</font>
+  <font color="green">///</font>
+  <font color="blue">void</font> Set<font color="black">(</font>CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> object<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Append a duplicate of the children and attributes of the specified object</font>
+  <font color="green">// to this object. If |overwriteAttributes| is true then any attributes in</font>
+  <font color="green">// this object that also exist in the specified object will be overwritten</font>
+  <font color="green">// with the new values. The name of this object is not changed.</font>
+  <font color="green">///</font>
+  <font color="blue">void</font> Append<font color="black">(</font>CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> object, <font color="blue">bool</font> overwriteAttributes<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Return a new object with the same name, children and attributes as this</font>
+  <font color="green">// object. The parent of the new object will be NULL.</font>
+  <font color="green">///</font>
+  CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> Duplicate<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Clears this object's children and attributes. The name and parenting of</font>
+  <font color="green">// this object are not changed.</font>
+  <font color="green">///</font>
+  <font color="blue">void</font> Clear<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Access the object's name. An object name must always be at least one</font>
+  <font color="green">// character long.</font>
+  <font color="green">///</font>
+  CefString GetName<font color="black">(</font><font color="black">)</font>;
+  <font color="blue">bool</font> SetName<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> <font color="blue">name</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Access the object's parent. The parent can be NULL if this object has not</font>
+  <font color="green">// been added as the child on another object.</font>
+  <font color="green">///</font>
+  <font color="blue">bool</font> HasParent<font color="black">(</font><font color="black">)</font>;
+  CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> GetParent<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Access the object's value. An object cannot have a value if it also has</font>
+  <font color="green">// children. Attempting to set the value while children exist will fail.</font>
+  <font color="green">///</font>
+  <font color="blue">bool</font> HasValue<font color="black">(</font><font color="black">)</font>;
+  CefString GetValue<font color="black">(</font><font color="black">)</font>;
+  <font color="blue">bool</font> SetValue<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> value<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Access the object's attributes. Attributes must have unique names.</font>
+  <font color="green">///</font>
+  <font color="blue">bool</font> HasAttributes<font color="black">(</font><font color="black">)</font>;
+  size_t GetAttributeCount<font color="black">(</font><font color="black">)</font>;
+  <font color="blue">bool</font> HasAttribute<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> <font color="blue">name</font><font color="black">)</font>;
+  CefString GetAttributeValue<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> <font color="blue">name</font><font color="black">)</font>;
+  <font color="blue">bool</font> SetAttributeValue<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> <font color="blue">name</font>, <font color="blue">const</font> CefString<font color="black">&</font> value<font color="black">)</font>;
+  size_t GetAttributes<font color="black">(</font>AttributeMap<font color="black">&</font> attributes<font color="black">)</font>;
+  <font color="blue">void</font> ClearAttributes<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Access the object's children. Each object can only have one parent so</font>
+  <font color="green">// attempting to add an object that already has a parent will fail. Removing a</font>
+  <font color="green">// child will set the child's parent to NULL. Adding a child will set the</font>
+  <font color="green">// child's parent to this object. This object's value, if any, will be cleared</font>
+  <font color="green">// if a child is added.</font>
+  <font color="green">///</font>
+  <font color="blue">bool</font> HasChildren<font color="black">(</font><font color="black">)</font>;
+  size_t GetChildCount<font color="black">(</font><font color="black">)</font>;
+  <font color="blue">bool</font> HasChild<font color="black">(</font>CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> child<font color="black">)</font>;
+  <font color="blue">bool</font> AddChild<font color="black">(</font>CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> child<font color="black">)</font>;
+  <font color="blue">bool</font> RemoveChild<font color="black">(</font>CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> child<font color="black">)</font>;
+  size_t GetChildren<font color="black">(</font>ObjectVector<font color="black">&</font> children<font color="black">)</font>;
+  <font color="blue">void</font> ClearChildren<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Find the first child with the specified name.</font>
+  <font color="green">///</font>
+  CefRefPtr<font color="black">&#60;</font>CefXmlObject<font color="black">&#62;</font> FindChild<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> <font color="blue">name</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Find all children with the specified name.</font>
+  <font color="green">///</font>
+  size_t FindChildren<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> <font color="blue">name</font>, ObjectVector<font color="black">&</font> children<font color="black">)</font>;
+
+<font color="blue">private</font><font color="black">:</font>
+  <font color="blue">void</font> SetParent<font color="black">(</font>CefXmlObject<font color="black">*</font> parent<font color="black">)</font>;
+
+  CefString name_;
+  CefXmlObject<font color="black">*</font> parent_;
+  CefString value_;
+  AttributeMap attributes_;
+  ObjectVector children_;
+
+  IMPLEMENT_REFCOUNTING<font color="black">(</font>CefXmlObject<font color="black">)</font>;
+  IMPLEMENT_LOCKING<font color="black">(</font>CefXmlObject<font color="black">)</font>;
+<font color="black">}</font>;
+
+
+<font color="green">///</font>
+<font color="green">// Thread safe implementation of the CefReadHandler class for reading an</font>
+<font color="green">// in-memory array of bytes.</font>
+<font color="green">///</font>
+<font color="blue">class</font> CefByteReadHandler <font color="black">:</font> <font color="blue">public</font> CefReadHandler
+<font color="black">{</font>
+<font color="blue">public</font><font color="black">:</font>
+  <font color="green">///</font>
+  <font color="green">// Create a new object for reading an array of bytes. An optional |source|</font>
+  <font color="green">// reference can be kept to keep the underlying data source from being</font>
+  <font color="green">// released while the reader exists.</font>
+  <font color="green">///</font>
+  CefByteReadHandler<font color="black">(</font><font color="blue">const</font> <font color="blue">unsigned</font> <font color="blue">char</font><font color="black">*</font> bytes, size_t size,
+                     CefRefPtr<font color="black">&#60;</font>CefBase<font color="black">&#62;</font> source<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Read raw binary data.</font>
+  <font color="green">///</font>
+  virtual size_t Read<font color="black">(</font><font color="blue">void</font><font color="black">*</font> ptr, size_t size, size_t n<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Seek to the specified offset position. |whence| may be any one of</font>
+  <font color="green">// SEEK_CUR, SEEK_END or SEEK_SET.</font>
+  <font color="green">///</font>
+  virtual <font color="blue">int</font> Seek<font color="black">(</font><font color="blue">long</font> offset, <font color="blue">int</font> whence<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Return the current offset position.</font>
+  <font color="green">///</font>
+  virtual <font color="blue">long</font> Tell<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Return non-zero if at end of file.</font>
+  <font color="green">///</font>
+  virtual <font color="blue">int</font> Eof<font color="black">(</font><font color="black">)</font>;
+
+<font color="blue">private</font><font color="black">:</font>
+  <font color="blue">const</font> <font color="blue">unsigned</font> <font color="blue">char</font><font color="black">*</font> bytes_;
+  size_t size_;
+  size_t offset_;
+  CefRefPtr<font color="black">&#60;</font>CefBase<font color="black">&#62;</font> source_;
+
+  IMPLEMENT_REFCOUNTING<font color="black">(</font>CefByteReadHandler<font color="black">)</font>;
+  IMPLEMENT_LOCKING<font color="black">(</font>CefByteReadHandler<font color="black">)</font>;
+<font color="black">}</font>;
+
+
+<font color="green">///</font>
+<font color="green">// Thread-safe class for accessing zip archive file contents. This class should</font>
+<font color="green">// not be used with large archive files because all data will be resident in</font>
+<font color="green">// memory at the same time. This implementation supports a restricted set of zip</font>
+<font color="green">// archive features:</font>
+<font color="green">// (1) Password-protected files are not supported.</font>
+<font color="green">// (2) All file names are stored and compared in lower case.</font>
+<font color="green">// (3) File ordering from the original zip archive is not maintained. This</font>
+<font color="green">//     means that files from the same folder may not be located together in the</font>
+<font color="green">//     file content map.</font>
+<font color="green">///</font>
+<font color="blue">class</font> CefZipArchive <font color="black">:</font> <font color="blue">public</font> CefBase
+<font color="black">{</font>
+<font color="blue">public</font><font color="black">:</font>
+  <font color="green">///</font>
+  <font color="green">// Class representing a file in the archive. Accessing the file data from</font>
+  <font color="green">// multiple threads is safe provided a reference to the File object is kept.</font>
+  <font color="green">///</font>
+  <font color="blue">class</font> File <font color="black">:</font> <font color="blue">public</font> CefBase
+  <font color="black">{</font>
+  <font color="blue">public</font><font color="black">:</font>
+    <font color="green">///</font>
+    <font color="green">// Returns the read-only data contained in the file.</font>
+    <font color="green">///</font>
+    virtual <font color="blue">const</font> <font color="blue">unsigned</font> <font color="blue">char</font><font color="black">*</font> GetData<font color="black">(</font><font color="black">)</font> <font color="black">=</font><font color="maroon">0</font>;
+
+    <font color="green">///</font>
+    <font color="green">// Returns the size of the data in the file.</font>
+    <font color="green">///</font>
+    virtual size_t GetDataSize<font color="black">(</font><font color="black">)</font> <font color="black">=</font><font color="maroon">0</font>;
+
+    <font color="green">///</font>
+    <font color="green">// Returns a CefStreamReader object for streaming the contents of the file.</font>
+    <font color="green">///</font>
+    virtual CefRefPtr<font color="black">&#60;</font>CefStreamReader<font color="black">&#62;</font> GetStreamReader<font color="black">(</font><font color="black">)</font> <font color="black">=</font><font color="maroon">0</font>;
+  <font color="black">}</font>;
+  <font color="blue">typedef</font> std<font color="black">:</font><font color="black">:</font>map<font color="black">&#60;</font>CefString, CefRefPtr<font color="black">&#60;</font>File<font color="black">&#62;</font> <font color="black">&#62;</font> FileMap;
+
+  <font color="green">///</font>
+  <font color="green">// Create a new object.</font>
+  <font color="green">///</font>
+  CefZipArchive<font color="black">(</font><font color="black">)</font>;
+  virtual ~CefZipArchive<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Load the contents of the specified zip archive stream into this object.</font>
+  <font color="green">// If |overwriteExisting| is true then any files in this object that also</font>
+  <font color="green">// exist in the specified archive will be replaced with the new files.</font>
+  <font color="green">// Returns the number of files successfully loaded.</font>
+  <font color="green">///</font>
+  size_t Load<font color="black">(</font>CefRefPtr<font color="black">&#60;</font>CefStreamReader<font color="black">&#62;</font> stream, <font color="blue">bool</font> overwriteExisting<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Clears the contents of this object.</font>
+  <font color="green">///</font>
+  <font color="blue">void</font> Clear<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Returns the number of files in the archive.</font>
+  <font color="green">///</font>
+  size_t GetFileCount<font color="black">(</font><font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Returns true if the specified file exists and has contents.</font>
+  <font color="green">///</font>
+  <font color="blue">bool</font> HasFile<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> fileName<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Returns the specified file.</font>
+  <font color="green">///</font>
+  CefRefPtr<font color="black">&#60;</font>File<font color="black">&#62;</font> GetFile<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> fileName<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Removes the specified file.</font>
+  <font color="green">///</font>
+  <font color="blue">bool</font> RemoveFile<font color="black">(</font><font color="blue">const</font> CefString<font color="black">&</font> fileName<font color="black">)</font>;
+
+  <font color="green">///</font>
+  <font color="green">// Returns the map of all files.</font>
+  <font color="green">///</font>
+  size_t GetFiles<font color="black">(</font>FileMap<font color="black">&</font> map<font color="black">)</font>;
+
+<font color="blue">private</font><font color="black">:</font>
+  FileMap contents_;
+
+  IMPLEMENT_REFCOUNTING<font color="black">(</font>CefZipArchive<font color="black">)</font>;
+  IMPLEMENT_LOCKING<font color="black">(</font>CefZipArchive<font color="black">)</font>;
+<font color="black">}</font>;
+
+<font color="blue">#endif</font> <font color="green">// _CEF_WRAPPER_H</font>
+
+</PRE>
+</BODY>
+</HTML>
