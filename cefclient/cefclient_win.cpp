@@ -33,6 +33,7 @@ LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
 // The global ClientHandler reference.
 extern CefRefPtr<ClientHandler> g_handler;
+extern CefRefPtr<CefCommandLine> g_command_line;
 
 #if defined(OS_WIN)
 // Add Common Controls to the application manifest because it's required to
@@ -164,8 +165,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // Store instance handle in our global variable
 
    hWnd = CreateWindow(szWindowClass, szTitle,
-      WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, CW_USEDEFAULT, 0, CW_USEDEFAULT,
-      0, NULL, NULL, hInstance, NULL);
+      WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+	  CW_USEDEFAULT, 0,
+	  800, 600, // @TODO set these from the command line
+	  NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
@@ -224,9 +227,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         info.SetAsChild(hWnd, rect);
 
         // Creat the new child browser window
+     	CefString url = g_command_line->GetSwitchValue("url");
         CefBrowser::CreateBrowser(info,
             static_cast<CefRefPtr<CefClient> >(g_handler),
-			"http://localhost:20009", settings);
+			url, settings);
             // "http://www.google.com", settings);
       }
       return 0;
@@ -315,9 +319,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
       // The frame window has exited
       PostQuitMessage(0);
-      return 0;
+	  return 0;
+
+	// Restricts window resizing smaller than the values below.
+	// @TODO allow these values to be set via commandline.
+	case WM_GETMINMAXINFO:
+	  LPMINMAXINFO pMMI = (LPMINMAXINFO)lParam;
+      pMMI->ptMinTrackSize.x = 600;
+      pMMI->ptMinTrackSize.y = 400;
+	  return 0;
     }
-  	
+
     return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
