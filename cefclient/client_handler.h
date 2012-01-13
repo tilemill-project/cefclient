@@ -53,12 +53,6 @@ public:
       { return this; }
 
   // CefLifeSpanHandler methods
-  virtual bool OnBeforePopup(CefRefPtr<CefBrowser> parentBrowser,
-                             const CefPopupFeatures& popupFeatures,
-                             CefWindowInfo& windowInfo,
-                             const CefString& url,
-                             CefRefPtr<CefClient>& client,
-                             CefBrowserSettings& settings) OVERRIDE;
   virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) OVERRIDE;
   virtual bool DoClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
   virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) OVERRIDE;
@@ -76,12 +70,6 @@ public:
                            CefString& errorText) OVERRIDE;
  
   // CefRequestHandler methods
-  virtual bool OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser,
-                                   CefRefPtr<CefRequest> request,
-                                   CefString& redirectUrl,
-                                   CefRefPtr<CefStreamReader>& resourceStream,
-                                   CefRefPtr<CefResponse> response,
-                                   int loadFlags) OVERRIDE;
   virtual bool GetDownloadHandler(CefRefPtr<CefBrowser> browser,
                                   const CefString& mimeType,
                                   const CefString& fileName,
@@ -93,11 +81,6 @@ public:
   virtual void OnNavStateChange(CefRefPtr<CefBrowser> browser,
                                 bool canGoBack,
                                 bool canGoForward) OVERRIDE;
-  virtual void OnAddressChange(CefRefPtr<CefBrowser> browser,
-                               CefRefPtr<CefFrame> frame,
-                               const CefString& url) OVERRIDE;
-  virtual void OnTitleChange(CefRefPtr<CefBrowser> browser,
-                             const CefString& title) OVERRIDE;
   virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
                                 const CefString& message,
                                 const CefString& source,
@@ -180,9 +163,6 @@ public:
   void CloseMainWindow();
 
 protected:
-  void SetLoading(bool isLoading);
-  void SetNavState(bool canGoBack, bool canGoForward);
-
   // The child browser window
   CefRefPtr<CefBrowser> m_Browser;
 

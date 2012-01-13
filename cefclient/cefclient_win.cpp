@@ -30,7 +30,6 @@ HWND hFindDlg = NULL; // Handle for the find dialog.
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
 // The global ClientHandler reference.
 extern CefRefPtr<ClientHandler> g_handler;
@@ -201,12 +200,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	PAINTSTRUCT ps;
 	HDC hdc;
 
-  if(hWnd == editWnd)
-  {
-    return (LRESULT)CallWindowProc(editWndOldProc, hWnd, message, wParam, lParam);
-  }
-  else
-  {
     // Callback for the main window
 	  switch (message)
 	  {
@@ -221,50 +214,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         int x = 0;
         
         GetClientRect(hWnd, &rect);
-        
-        backWnd = CreateWindow(L"BUTTON", L"Back",
-                               WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON
-                               | WS_DISABLED, x, 0, BUTTON_WIDTH, URLBAR_HEIGHT,
-                               hWnd, (HMENU) IDC_NAV_BACK, hInst, 0);
-        x += BUTTON_WIDTH;
-
-        forwardWnd = CreateWindow(L"BUTTON", L"Forward",
-                                  WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON
-                                  | WS_DISABLED, x, 0, BUTTON_WIDTH,
-                                  URLBAR_HEIGHT, hWnd, (HMENU) IDC_NAV_FORWARD,
-                                  hInst, 0);
-        x += BUTTON_WIDTH;
-
-        reloadWnd = CreateWindow(L"BUTTON", L"Reload",
-                                 WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON
-                                 | WS_DISABLED, x, 0, BUTTON_WIDTH,
-                                 URLBAR_HEIGHT, hWnd, (HMENU) IDC_NAV_RELOAD,
-                                 hInst, 0);
-        x += BUTTON_WIDTH;
-
-        stopWnd = CreateWindow(L"BUTTON", L"Stop",
-                               WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON
-                               | WS_DISABLED, x, 0, BUTTON_WIDTH, URLBAR_HEIGHT,
-                               hWnd, (HMENU) IDC_NAV_STOP, hInst, 0);
-        x += BUTTON_WIDTH;
-
-        editWnd = CreateWindow(L"EDIT", 0,
-                               WS_CHILD | WS_VISIBLE | WS_BORDER | ES_LEFT |
-                               ES_AUTOVSCROLL | ES_AUTOHSCROLL| WS_DISABLED, 
-                               x, 0, rect.right - BUTTON_WIDTH * 4,
-                               URLBAR_HEIGHT, hWnd, 0, hInst, 0);
-        
-        // Assign the edit window's WNDPROC to this function so that we can
-        // capture the enter key
-        editWndOldProc =
-            reinterpret_cast<WNDPROC>(GetWindowLongPtr(editWnd, GWLP_WNDPROC));
-        SetWindowLongPtr(editWnd, GWLP_WNDPROC,
-            reinterpret_cast<LONG_PTR>(WndProc)); 
-        g_handler->SetEditHwnd(editWnd);
-        g_handler->SetButtonHwnds(backWnd, forwardWnd, reloadWnd, stopWnd);
-        
-        rect.top += URLBAR_HEIGHT;
-         
         CefWindowInfo info;
         CefBrowserSettings settings;
 
@@ -292,9 +241,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // Parse the menu selections:
         switch (wmId)
         {
-        case IDM_ABOUT:
-          DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-          return 0;
         case IDM_EXIT:
           DestroyWindow(hWnd);
           return 0;
@@ -403,17 +349,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
       if(g_handler.get() && g_handler->GetBrowserHwnd())
       {
-        // Resize the browser window and address bar to match the new frame
-        // window size
+        // Resize the browser window to match the new frame window size
         RECT rect;
         GetClientRect(hWnd, &rect);
-        rect.top += URLBAR_HEIGHT;
-
-        int urloffset = rect.left + BUTTON_WIDTH * 4;
-
         HDWP hdwp = BeginDeferWindowPos(1);
-        hdwp = DeferWindowPos(hdwp, editWnd, NULL, urloffset,
-          0, rect.right - urloffset, URLBAR_HEIGHT, SWP_NOZORDER);
         hdwp = DeferWindowPos(hdwp, g_handler->GetBrowserHwnd(), NULL,
           rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
           SWP_NOZORDER);
@@ -447,159 +386,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
   	
     return DefWindowProc(hWnd, message, wParam, lParam);
-  }
 }
-
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		return (INT_PTR)TRUE;
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
-}
-
 
 // Global functions
 
 std::string AppGetWorkingDirectory()
 {
 	return szWorkingDir;
-}
-
-void RunTransparentPopupTest(CefRefPtr<CefBrowser> browser)
-{
-  CefWindowInfo info;
-  CefBrowserSettings settings;
-
-  // Initialize window info to the defaults for a popup window
-  info.SetAsPopup(NULL, "TransparentPopup");
-  info.SetTransparentPainting(TRUE);
-  info.m_nWidth = 500;
-  info.m_nHeight = 500;
-
-  // Creat the popup browser window
-  CefBrowser::CreateBrowser(info,
-      static_cast<CefRefPtr<CefClient> >(g_handler),
-      "http://tests/transparency", settings);
-}
-
-namespace {
-
-// Determine a temporary path for the bitmap file.
-bool GetBitmapTempPath(LPWSTR szTempName)
-{
-  DWORD dwRetVal;
-  DWORD dwBufSize = 512;
-  TCHAR lpPathBuffer[512];
-  UINT uRetVal;
-    
-  dwRetVal = GetTempPath(dwBufSize,     // length of the buffer
-                         lpPathBuffer); // buffer for path 
-  if (dwRetVal > dwBufSize || (dwRetVal == 0))
-    return false;
-
-  // Create a temporary file. 
-  uRetVal = GetTempFileName(lpPathBuffer, // directory for tmp files
-                            L"image",     // temp file name prefix 
-                            0,            // create unique name 
-                            szTempName);  // buffer for name 
-  if (uRetVal == 0)
-    return false;
- 
-  size_t len = wcslen(szTempName);
-  wcscpy(szTempName + len - 3, L"bmp");
-  return true;
-}
-
-void UIT_RunGetImageTest(CefRefPtr<CefBrowser> browser)
-{
-  REQUIRE_UI_THREAD();
-
-  int width, height;
-  bool success = false;
-
-  // Retrieve the image size.
-  if (browser->GetSize(PET_VIEW, width, height)) {
-    void* bits;
-
-    // Populate the bitmap info header.
-    BITMAPINFOHEADER info;
-    info.biSize = sizeof(BITMAPINFOHEADER);
-    info.biWidth = width;
-    info.biHeight = -height;  // minus means top-down bitmap
-    info.biPlanes = 1;
-    info.biBitCount = 32;
-    info.biCompression = BI_RGB;  // no compression
-    info.biSizeImage = 0;
-    info.biXPelsPerMeter = 1;
-    info.biYPelsPerMeter = 1;
-    info.biClrUsed = 0;
-    info.biClrImportant = 0;
-
-    // Create the bitmap and retrieve the bit buffer.
-    HDC screen_dc = GetDC(NULL);
-    HBITMAP bitmap =
-        CreateDIBSection(screen_dc, reinterpret_cast<BITMAPINFO*>(&info),
-                         DIB_RGB_COLORS, &bits, NULL, 0);
-    ReleaseDC(NULL, screen_dc);
-  
-    // Read the image into the bit buffer.
-    if (bitmap && browser->GetImage(PET_VIEW, width, height, bits)) {
-      // Populate the bitmap file header.
-      BITMAPFILEHEADER file;
-      file.bfType = 0x4d42;
-      file.bfSize = sizeof(BITMAPFILEHEADER);
-      file.bfReserved1 = 0;
-      file.bfReserved2 = 0;
-      file.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-
-      TCHAR temp_path[512];
-      if (GetBitmapTempPath(temp_path)) {
-        // Write the bitmap to file.
-        HANDLE file_handle =
-            CreateFile(temp_path, GENERIC_WRITE, 0, 0, CREATE_ALWAYS,
-                       FILE_ATTRIBUTE_NORMAL, 0);
-        if (file_handle != INVALID_HANDLE_VALUE) {
-          DWORD bytes_written = 0;
-          WriteFile(file_handle, &file, sizeof(file), &bytes_written, 0);
-          WriteFile(file_handle, &info, sizeof(info), &bytes_written, 0);
-          WriteFile(file_handle, bits, width * height * 4, &bytes_written, 0);
-
-          CloseHandle(file_handle);
-
-          // Open the bitmap in the default viewer.
-          ShellExecute(NULL, L"open", temp_path, NULL, NULL, SW_SHOWNORMAL);
-          success = true;
-        }
-      }
-    }
-
-    DeleteObject(bitmap);
-  }
-
-  if (!success) {
-    browser->GetMainFrame()->ExecuteJavaScript(
-        "alert('Failed to create image!');",
-        browser->GetMainFrame()->GetURL(), 0);
-  }
-}
-
-} // namespace
-
-void RunGetImageTest(CefRefPtr<CefBrowser> browser)
-{
-  // Execute the test function on the UI thread.
-  CefPostTask(TID_UI, NewCefRunnableFunction(UIT_RunGetImageTest, browser));
 }

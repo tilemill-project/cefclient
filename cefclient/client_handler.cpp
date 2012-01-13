@@ -75,11 +75,6 @@ void ClientHandler::OnLoadStart(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame)
 {
   REQUIRE_UI_THREAD();
-
-  if(m_BrowserHwnd == browser->GetWindowHandle() && frame->IsMain()) {
-    // We've just started loading a page
-    SetLoading(true);
-  }
 }
 
 void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
@@ -89,9 +84,6 @@ void ClientHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser,
   REQUIRE_UI_THREAD();
 
   if(m_BrowserHwnd == browser->GetWindowHandle() && frame->IsMain()) {
-    // We've just finished loading a page
-    SetLoading(false);
-
     CefRefPtr<CefDOMVisitor> visitor = GetDOMVisitor(frame->GetURL());
     if(visitor.get())
       frame->VisitDOM(visitor);
@@ -152,8 +144,6 @@ void ClientHandler::OnNavStateChange(CefRefPtr<CefBrowser> browser,
                                      bool canGoForward)
 {
   REQUIRE_UI_THREAD();
-
-  SetNavState(canGoBack, canGoForward);
 }
 
 bool ClientHandler::OnConsoleMessage(CefRefPtr<CefBrowser> browser,
