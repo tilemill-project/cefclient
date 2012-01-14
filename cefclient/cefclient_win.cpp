@@ -196,6 +196,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         CefBrowser::CreateBrowser(info,
           static_cast<CefRefPtr<CefClient> >(g_handler),
 		      url, settings);
+
+        // Set window icon if --ico flag is set.
+        if (g_command_line->HasSwitch("ico")) {
+          LPCWSTR ico = L"";
+          ico = LPCWSTR(g_command_line->GetSwitchValue("ico").c_str());
+          HANDLE hIconBig = LoadImage(NULL, ico, IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
+          HANDLE hIconSmall = LoadImage(NULL, ico, IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+          SendMessage(hWnd, WM_SETICON, ICON_BIG, LPARAM(hIconBig));
+          SendMessage(hWnd, WM_SETICON, ICON_SMALL, LPARAM(hIconSmall));
+        }
       }
       return 0;
 
