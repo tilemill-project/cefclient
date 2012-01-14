@@ -2,6 +2,8 @@
 // reserved. Use of this source code is governed by a BSD-style license that
 // can be found in the LICENSE file.
 
+#include "windows.h"
+#include "shellapi.h"
 #include "include/cef.h"
 #include "client_popup_handler.h"
 #include "util.h"
@@ -25,8 +27,10 @@ bool ClientPopupHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
 {
   REQUIRE_UI_THREAD();
     
-  // Load the request in the parent browser window.
-  m_ParentBrowser->GetMainFrame()->LoadRequest(request);
+  // Load the request in the the default browser.
+  LPCWSTR url;
+  url = LPCWSTR(request->GetURL().c_str());
+  ShellExecute(NULL,L"open",url,NULL,NULL,SW_SHOWNORMAL);
   browser->CloseBrowser();
   m_ParentBrowser = NULL;
 

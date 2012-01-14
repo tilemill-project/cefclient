@@ -6,10 +6,24 @@
 #include "include/cef_wrapper.h"
 #include "client_handler.h"
 #include "resource.h"
-
-#ifdef TEST_REDIRECT_POPUP_URLS
 #include "client_popup_handler.h"
-#endif
+
+bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> parentBrowser,
+                                  const CefPopupFeatures& popupFeatures,
+                                  CefWindowInfo& windowInfo,
+                                  const CefString& url,
+                                  CefRefPtr<CefClient>& client,
+                                  CefBrowserSettings& settings)
+{
+  REQUIRE_UI_THREAD();
+  std::string urlStr = url;
+  if(urlStr.find("chrome-devtools:") == std::string::npos) {
+    // Show all popup windows excluding DevTools in the current window.
+    windowInfo.m_dwStyle &= ~WS_VISIBLE;
+    client = new ClientPopupHandler(m_Browser);
+  }
+  return false;
+}
 
 void ClientHandler::SendNotification(NotificationType type)
 {

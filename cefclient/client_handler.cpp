@@ -21,7 +21,6 @@ ClientHandler::~ClientHandler()
 {
 }
 
-
 void ClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
   REQUIRE_UI_THREAD();
