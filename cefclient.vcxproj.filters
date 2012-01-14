@@ -127,9 +127,6 @@
     <ClInclude Include="cefclient\util.h">
       <Filter>cefclient</Filter>
     </ClInclude>
-    <ClCompile Include="cefclient\client_handler_win.cpp">
-      <Filter>cefclient</Filter>
-    </ClCompile>
     <None Include="cefclient\res\extensionperf.html">
       <Filter>cefclient\res</Filter>
     </None>

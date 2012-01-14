@@ -312,7 +312,6 @@
     <ClCompile Include="cefclient\cefclient_win.cpp" />
     <ClCompile Include="cefclient\client_handler.cpp" />
     <ClCompile Include="cefclient\client_popup_handler.cpp" />
-    <ClCompile Include="cefclient\client_handler_win.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="cefclient\cefclient.rc" />

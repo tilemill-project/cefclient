@@ -6,9 +6,12 @@
 #define _CLIENT_HANDLER_H
 
 #include "include/cef.h"
+#include "include/cef_wrapper.h"
 #include "download_handler.h"
 #include "util.h"
-
+#include "client_handler.h"
+#include "resource.h"
+#include "client_popup_handler.h"
 
 // Define this value to redirect all popup URLs to the main application browser
 // window.
@@ -26,6 +29,7 @@ class ClientHandler : public CefClient,
                       public CefPrintHandler,
                       public CefV8ContextHandler,
                       public CefDragHandler,
+                      public CefMenuHandler,
                       public DownloadListener
 {
 public:
@@ -50,6 +54,8 @@ public:
   virtual CefRefPtr<CefV8ContextHandler> GetV8ContextHandler() OVERRIDE
       { return this; }
   virtual CefRefPtr<CefDragHandler> GetDragHandler() OVERRIDE
+      { return this; }
+  virtual CefRefPtr<CefMenuHandler> GetMenuHandler() OVERRIDE
       { return this; }
 
   // CefLifeSpanHandler methods
@@ -98,6 +104,11 @@ public:
   virtual bool OnDragEnter(CefRefPtr<CefBrowser> browser,
                            CefRefPtr<CefDragData> dragData,
                            DragOperationsMask mask) OVERRIDE;
+
+  // CefMenuHandler methods.
+  virtual bool OnBeforeMenu(CefRefPtr<CefBrowser> browser,
+                            const CefMenuInfo& menuInfo) OVERRIDE;
+
 
   // DownloadListener methods
   virtual void NotifyDownloadComplete(const CefString& fileName) OVERRIDE;
