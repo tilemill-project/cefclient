@@ -25,23 +25,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Binary
-//
-
-IDS_LOGO BINARY "res\\logo.png"
-IDS_UIPLUGIN BINARY "res\\uiplugin.html"
-IDS_OSRPLUGIN BINARY "res\\osrplugin.html"
-IDS_LOGOBALL BINARY "res\\logoball.png"
-IDS_LOCALSTORAGE BINARY "res\\localstorage.html"
-IDS_XMLHTTPREQUEST BINARY "res\\xmlhttprequest.html"
-IDS_DOMACCESS BINARY "res\\domaccess.html"
-IDS_MODALMAIN BINARY "res\\modalmain.html"
-IDS_MODALDIALOG BINARY "res\\modaldialog.html"
-IDS_EXTENSIONPERF BINARY "res\\extensionperf.html"
-IDS_TRANSPARENCY BINARY "res\\transparency.html"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Icon
 //
 
