@@ -10,7 +10,6 @@
 #include <commdlg.h>
 #include <direct.h>
 #include <sstream>
-
 #include <shellapi.h>
 
 #define MAX_LOADSTRING 100
@@ -66,8 +65,16 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
   HACCEL hAccelTable;
 
-  CefString szName = g_command_line->GetSwitchValue("name");
-  LPCWSTR szNamew = szName.c_str();
+  LPCWSTR optName = L"CefClient";
+  int optWidth = 800;
+  int optHeight = 600;
+  if (g_command_line->HasSwitch("name"))
+    optName = LPCWSTR(g_command_line->GetSwitchValue("name").c_str());
+  // @TODO figure out why these lead to garbled optName
+  // if (g_command_line->HasSwitch("width"))
+  //   optWidth = _wtoi(g_command_line->GetSwitchValue("width").c_str());
+  // if (g_command_line->HasSwitch("height"))
+  //   optHeight = _wtoi(g_command_line->GetSwitchValue("height").c_str());
 
   WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -80,7 +87,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
 	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_CEFCLIENT);
-	wcex.lpszClassName	= szNamew;
+	wcex.lpszClassName	= optName;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
 	if (!RegisterClassEx(&wcex)) return FALSE;
@@ -89,12 +96,13 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
   HWND hWnd;
   hInst = hInstance; // Store instance handle in our global variable
   hWnd = CreateWindow(
-	  szNamew,
-	  szNamew,
-      WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-	  CW_USEDEFAULT, 0,
-	  800, 600, // @TODO set these from the command line
-	  NULL, NULL, hInstance, NULL);
+    optName,
+    optName,
+    WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+    CW_USEDEFAULT, 0,
+    optWidth,
+    optHeight,
+    NULL, NULL, hInstance, NULL);
 
   if (!hWnd) return FALSE;
 
@@ -182,10 +190,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         info.SetAsChild(hWnd, rect);
 
         // Creat the new child browser window
-     	CefString url = g_command_line->GetSwitchValue("url");
+        CefString url = CefString("http://google.com");
+        if (g_command_line->HasSwitch("url"))
+          url = g_command_line->GetSwitchValue("url");
         CefBrowser::CreateBrowser(info,
-            static_cast<CefRefPtr<CefClient> >(g_handler),
-			url, settings);
+          static_cast<CefRefPtr<CefClient> >(g_handler),
+		      url, settings);
       }
       return 0;
 
@@ -276,12 +286,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	  return 0;
 
 	// Restricts window resizing smaller than the values below.
-	// @TODO allow these values to be set via commandline.
 	case WM_GETMINMAXINFO:
-	  LPMINMAXINFO pMMI = (LPMINMAXINFO)lParam;
-      pMMI->ptMinTrackSize.x = 600;
-      pMMI->ptMinTrackSize.y = 400;
-	  return 0;
+    int minwidth = 600;
+    int minheight = 400;
+    // @TODO find out why these lead to garbled optName.
+    // if (g_command_line->HasSwitch("minwidth"))
+    //   minwidth = _wtoi(g_command_line->GetSwitchValue("minwidth").c_str());
+    // if (g_command_line->HasSwitch("minheight"))
+    //   minheight = _wtoi(g_command_line->GetSwitchValue("minheight").c_str());
+
+    LPMINMAXINFO pMMI = (LPMINMAXINFO)lParam;
+      pMMI->ptMinTrackSize.x = minwidth;
+      pMMI->ptMinTrackSize.y = minheight;
+    return 0;
     }
 
     return DefWindowProc(hWnd, message, wParam, lParam);
