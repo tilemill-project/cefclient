@@ -65,16 +65,15 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
   HACCEL hAccelTable;
 
-  LPCWSTR optName = L"CefClient";
+  std::wstring optName;
   int optWidth = 800;
   int optHeight = 600;
   if (g_command_line->HasSwitch("name"))
-    optName = LPCWSTR(g_command_line->GetSwitchValue("name").c_str());
-  // @TODO figure out why these lead to garbled optName
-  // if (g_command_line->HasSwitch("width"))
-  //   optWidth = _wtoi(g_command_line->GetSwitchValue("width").c_str());
-  // if (g_command_line->HasSwitch("height"))
-  //   optHeight = _wtoi(g_command_line->GetSwitchValue("height").c_str());
+    optName = g_command_line->GetSwitchValue("name").ToWString();
+  if (g_command_line->HasSwitch("width"))
+    optWidth = _wtoi(g_command_line->GetSwitchValue("width").c_str());
+  if (g_command_line->HasSwitch("height"))
+    optHeight = _wtoi(g_command_line->GetSwitchValue("height").c_str());
 
   WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -87,7 +86,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
 	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_CEFCLIENT);
-	wcex.lpszClassName	= optName;
+	wcex.lpszClassName	= optName.c_str();
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
 	if (!RegisterClassEx(&wcex)) return FALSE;
@@ -96,8 +95,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
   HWND hWnd;
   hInst = hInstance; // Store instance handle in our global variable
   hWnd = CreateWindow(
-    optName,
-    optName,
+    optName.c_str(),
+    optName.c_str(),
     WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
     CW_USEDEFAULT, 0,
     optWidth,
@@ -199,10 +198,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         // Set window icon if --ico flag is set.
         if (g_command_line->HasSwitch("ico")) {
-          LPCWSTR ico = L"";
-          ico = LPCWSTR(g_command_line->GetSwitchValue("ico").c_str());
-          HANDLE hIconBig = LoadImage(NULL, ico, IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
-          HANDLE hIconSmall = LoadImage(NULL, ico, IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+          std::wstring ico;
+          ico = g_command_line->GetSwitchValue("ico").ToWString();
+          HANDLE hIconBig = LoadImage(NULL, ico.c_str(), IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
+          HANDLE hIconSmall = LoadImage(NULL, ico.c_str(), IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
           SendMessage(hWnd, WM_SETICON, ICON_BIG, LPARAM(hIconBig));
           SendMessage(hWnd, WM_SETICON, ICON_SMALL, LPARAM(hIconSmall));
         }
@@ -299,11 +298,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_GETMINMAXINFO:
     int minwidth = 600;
     int minheight = 400;
-    // @TODO find out why these lead to garbled optName.
-    // if (g_command_line->HasSwitch("minwidth"))
-    //   minwidth = _wtoi(g_command_line->GetSwitchValue("minwidth").c_str());
-    // if (g_command_line->HasSwitch("minheight"))
-    //   minheight = _wtoi(g_command_line->GetSwitchValue("minheight").c_str());
+    if (g_command_line->HasSwitch("minwidth"))
+      minwidth = _wtoi(g_command_line->GetSwitchValue("minwidth").c_str());
+    if (g_command_line->HasSwitch("minheight"))
+      minheight = _wtoi(g_command_line->GetSwitchValue("minheight").c_str());
 
     LPMINMAXINFO pMMI = (LPMINMAXINFO)lParam;
       pMMI->ptMinTrackSize.x = minwidth;
