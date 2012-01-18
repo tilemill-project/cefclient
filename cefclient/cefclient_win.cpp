@@ -24,8 +24,6 @@ UINT uFindMsg;  // Message identifier for find events.
 HWND hFindDlg = NULL; // Handle for the find dialog.
 
 // Forward declarations of functions included in this code module:
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
 // The global ClientHandler reference.
@@ -65,7 +63,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
   HACCEL hAccelTable;
 
-  std::wstring optName;
+  std::wstring optName(L"MapBox");
   int optWidth = 800;
   int optHeight = 600;
   if (g_command_line->HasSwitch("name"))
