@@ -63,7 +63,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 
   HACCEL hAccelTable;
 
-  std::wstring optName(L"MapBox");
+  std::wstring optName(L"CefClient");
   int optWidth = 800;
   int optHeight = 600;
   if (g_command_line->HasSwitch("name"))
