@@ -28,9 +28,8 @@ bool ClientPopupHandler::OnBeforeBrowse(CefRefPtr<CefBrowser> browser,
   REQUIRE_UI_THREAD();
     
   // Load the request in the the default browser.
-  LPCWSTR url;
-  url = LPCWSTR(request->GetURL().c_str());
-  ShellExecute(NULL,L"open",url,NULL,NULL,SW_SHOWNORMAL);
+  //OutputDebugString(url);
+  ShellExecute(NULL,L"open",request->GetURL().ToWString().c_str(),NULL,NULL,SW_SHOWNORMAL);
   browser->CloseBrowser();
   m_ParentBrowser = NULL;
 
