@@ -135,10 +135,12 @@ bool ClientHandler::OnKeyEvent(CefRefPtr<CefBrowser> browser,
   if (isAfterJavaScript && !m_bFormElementHasFocus && code == 0x20) {
     // Special handling for the space character if a form element does not have
     // focus.
+    /*
     if (type == KEYEVENT_RAWKEYDOWN) {
       browser->GetMainFrame()->ExecuteJavaScript(
           "alert('You pressed the space bar!');", "", 0);
     }
+    */
     return true;
   }
 
